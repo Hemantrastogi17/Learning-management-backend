@@ -1,6 +1,7 @@
 const express = require('express')
 const fetchUser = require("../middleware/fetchUser");
 const Subject = require('../models/Subject');
+const Teacher = require('../models/Teacher');
 const { body, validationResult } = require('express-validator');
 const fetchTeacher = require('../middleware/fetchTeacher');
 const { NotBeforeError } = require('jsonwebtoken');
@@ -30,8 +31,9 @@ router.post('/addsubject', fetchTeacher, [
         if (!errors.isEmpty()) {
             return res.status(400).json({ errors: errors.array() });
         }
+        const faculty = await Teacher.findById(req.teacher.id)
         const subject = new Subject({
-            subjectName, courseName, subjectCode, subjectFaculty: req.teacher.id, students: ['62591c192ff1f84a013d2d6b','62598d2d757a2d44378aa4aa']
+            subjectName, courseName, subjectCode, subjectFaculty: faculty.name, students: ['62591c192ff1f84a013d2d6b','62598d2d757a2d44378aa4aa']
         })
         const newSubject = await subject.save()
         res.json(newSubject)

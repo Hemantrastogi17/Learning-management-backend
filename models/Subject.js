@@ -21,7 +21,7 @@ const SubjectSchema = new Schema({
         required: true,
     },
     subjectFaculty:{
-        type: mongoose.Schema.Types.ObjectId,
+        type: String,
         ref: 'teacher',
         required : true
     }
