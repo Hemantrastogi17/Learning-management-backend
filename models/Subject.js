@@ -24,6 +24,11 @@ const SubjectSchema = new Schema({
         type: String,
         ref: 'teacher',
         required : true
+    },
+    subjectFacultyId:{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'teacher',
+        required : true
     }
 })
 const Subject = mongoose.model('subject',SubjectSchema)

@@ -33,7 +33,7 @@ router.post('/addsubject', fetchTeacher, [
         }
         const faculty = await Teacher.findById(req.teacher.id)
         const subject = new Subject({
-            subjectName, courseName, subjectCode, subjectFaculty: faculty.name, students: ['62591c192ff1f84a013d2d6b','62598d2d757a2d44378aa4aa']
+            subjectName, courseName, subjectCode, subjectFaculty: faculty.name, students: ['62591c192ff1f84a013d2d6b','62598d2d757a2d44378aa4aa'],subjectFacultyId: req.teacher.id
         })
         const newSubject = await subject.save()
         res.json(newSubject)
@@ -48,8 +48,6 @@ router.post('/addsubject', fetchTeacher, [
 router.put('/updatesubject/:id',fetchTeacher,async(req,res)=>{
     const { subjectName, subjectCode } = req.body;
     try {
-
-
         // Create a new subject
         const newSubject = {}
         if (subjectName) {
@@ -58,14 +56,12 @@ router.put('/updatesubject/:id',fetchTeacher,async(req,res)=>{
         if (subjectCode) {
             newSubject.subjectCode = subjectCode
         }
-        
-
         // FInd the subject to be updated and update it
         let subject = await Subject.findById(req.params.id)
         if (!subject) {
             res.status(404).send("Not found")
         }
-        if (subject.subjectFaculty.toString() !== req.teacher.id) {
+        if (subject.subjectFacultyId.toString() !== req.teacher.id) {
             return res.status(401).send("Not Allowed")
         }
 
@@ -87,7 +83,7 @@ router.delete('/deletesubject/:id',fetchTeacher,async(req,res)=>{
             res.status(404).send("Not found")
         }
         // Allow deletion only if the faculty owns this subject
-        if (subject.subjectFaculty.toString() !== req.teacher.id) {
+        if (subject.subjectFacultyId.toString() !== req.teacher.id) {
             return res.status(401).send("Not Allowed")
         }
 

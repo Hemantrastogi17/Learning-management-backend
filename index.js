@@ -10,6 +10,7 @@ app.use(cors())
 // Routes available
 app.use('/api/auth',require('./routes/auth.js'))
 app.use('/api/subjects',require('./routes/subjects.js'))
+app.use('/api/faculty',require('./routes/faculty.js'))
 
 
 app.listen(port, () => {

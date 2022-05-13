@@ -32,6 +32,10 @@ router.post('/teacher',[
         name: req.body.name,
         email: req.body.email,
         password: secPass,
+        contact: req.body.contact,
+        seatingBlock: req.body.seatingBlock,
+        seatingFloor: req.body.seatingFloor,
+        seatingRoom: req.body.seatingRoom,
         role: 'teacher'
       })
       const data = {
@@ -60,9 +64,10 @@ router.post('/signup',[
     body('email','Enter a valid email').isEmail(),
     body('password','Password must be contain 8 characters').isLength({ min: 8 })
 ],async (req,res)=>{
+    let success = false
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
+      return res.status(400).json({ success,errors: errors.array() });
     }
 
     try{
@@ -70,7 +75,7 @@ router.post('/signup',[
       const secPass = await bcrypt.hash(req.body.password,salt)
       let user = await User.findOne({email: req.body.email})
       if(user){
-        return res.status(400).json({err:"Sorry a user with this email already exists"})
+        return res.status(400).json({success,err:"Sorry a user with this email already exists"})
       }
       user =await User.create({
         name: req.body.name,
@@ -84,7 +89,8 @@ router.post('/signup',[
         }
       }
       const jwtToken = jwt.sign(data,JWT_SECRET)
-      res.json({jwtToken})
+      success = true
+      res.json({success,jwtToken})
       
     }
     catch(err){
@@ -101,16 +107,18 @@ router.post('/login',[
   body('email','Enter a valid email').isEmail(),
   body('password','Password cannot be blank').exists()
 ],async (req,res) =>{
-
+  let success = false
   const {email,password} = req.body
   try {
     let user = await User.findOne({email})
     if(!user){
+      success = false
       return res.status(400).json({err: 'Incorrect credentials'})
     }
     let passwordCompare = await bcrypt.compare(password,user.password)
     if(!passwordCompare){
-      return res.status(400).json({err: 'Incorrect credentials'})
+      success = false
+      return res.status(400).json({success,err: 'Incorrect credentials'})
     }
     const data = {
       user: {
@@ -118,7 +126,8 @@ router.post('/login',[
       }
     }
     const jwtToken = jwt.sign(data,JWT_SECRET)
-    res.json({jwtToken})
+    success = true
+    res.json({success,jwtToken})
 
   } catch (error) {
     console.log(error.message)
@@ -200,5 +209,7 @@ router.get('/fetch-teacher',fetchTeacher,async(req, res)=>{
       return res.status(400).json({ errors: errors.array() });
     }
 })
+
+
 
 module.exports = router
